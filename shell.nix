@@ -7,6 +7,7 @@ pkgs.mkShellNoCC {
   packages = with pkgs; [
     gnumake
     pkg-config
+    gcc
     glew
     glfw
     glm

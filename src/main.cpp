@@ -7,12 +7,19 @@
 #include "camera.hpp"
 #include "feature_tree/complex.hpp"
 #include "feature_tree/cylinder.hpp"
+#include <functional>
 
 #include <iostream>
+
 
 int main()
 {
     auto window = init().value();
+    Camera camera;
+    glfwSetFramebufferSizeCallback(
+        window,
+        Camera::resize_callback
+    );
     // vertex array
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
@@ -28,7 +35,6 @@ int main()
     // uniform handles
     GLuint mvp_id = glGetUniformLocation( programID, "MVP" );
 
-    Camera camera;
 
     Complex feature;
     feature.add_feature( std::make_unique<Cylinder>(12, 6) );

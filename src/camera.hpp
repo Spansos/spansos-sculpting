@@ -8,6 +8,11 @@
 
 class Camera {
 public:
+    Camera( ) {
+        if ( !active_camera )
+            active_camera = this;
+    }
+
     void do_input_shit() {
         auto *window = glfwGetCurrentContext( );
 
@@ -51,7 +56,22 @@ public:
         return _projection * _view * model;
     }
 
+    void resize( int width, int height ) {
+        glViewport( 0, 0, width, height );
+        _projection = glm::perspective(
+            glm::radians(_FoV),
+            (float)width/height,
+            0.1f,
+            250.0f
+        );
+    }
+
+    static void resize_callback( GLFWwindow * window, int width, int height ) {
+        Camera::active_camera->resize( width, height );
+    }
+
 private:
+    static Camera * active_camera;
     glm::vec3 _point_of_intereset = {0.0f, 0.0f, 0.0f};
     glm::vec3 _position = {30.0f,0.0f,0.0f};
     glm::vec2 _prev_mouse_pos;
@@ -59,11 +79,8 @@ private:
     float _orbit_speed = .25f;
     float _pan_speed = .1f;
     float _zoom_speed = .5f;
-    glm::mat4 _projection = glm::perspective(
-        glm::radians(_FoV),
-        4.0f/3.0f,
-        0.1f,
-        250.0f
-    );
+    glm::mat4 _projection;
     glm::mat4 _view;
 };
+
+Camera * Camera::active_camera;
