@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 
+#include <iostream>
+
 std::optional<GLFWwindow *> init() {
     glewExperimental = true; // Needed for core profile
     if( !glfwInit() ) {
@@ -16,8 +18,9 @@ std::optional<GLFWwindow *> init() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We want core functionality (instead of older something-something (which is higher level))
 
-    GLFWwindow* window = glfwCreateWindow( 1024, 768, "Scuxel", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow( 1024, 768, "Spansos Voxel Sculpting", NULL, NULL);
     if( !window ) {
+        std::cout << "window no window" << std::endl;
         // std::cerr << "Failed to open GLFW window.\n";
         glfwTerminate();
         return {};
