@@ -12,8 +12,7 @@
 #include <variant>
 #include <cstring>
 #include <memory>
-
-#include <iostream>
+#include <algorithm>
 
 class Feature {
 public:
@@ -83,6 +82,24 @@ public:
             }
         }
     }
+
+    virtual std::unique_ptr<Feature> copy() = 0;
+
+    virtual void add_feature( std::unique_ptr<Feature> feature ) {
+        (void)feature;
+    }
+
+    void remove_feature( Feature * feature ) {
+        auto as_unique = std::unique_ptr<Feature>(feature);
+        auto i = std::remove( _sub_features.begin(), _sub_features.end(), as_unique );
+        _sub_features.erase( i, _sub_features.end() );
+        as_unique.release();
+        get_root()->generate();
+    }
+
+    Feature * get_parent() {
+        return _parent;
+    }
     
     Feature * get_root() {
         if ( _parent )
@@ -101,6 +118,10 @@ public:
         return nullptr;
     }
 
+    void select() {
+        _is_selected = true;
+    }
+
     void disable_all() {
         _is_selected = false;
         for ( auto &feature : _sub_features )
@@ -109,7 +130,7 @@ public:
 
     GLsizei get_vertex_count( );
 
-    glm::mat4 matrix = glm::mat4{ 1.0f };
+    virtual ~Feature() { }
 
 protected:
     std::map<std::string, std::variant<int, float, bool, std::string>> _settings;

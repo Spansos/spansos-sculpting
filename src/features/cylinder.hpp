@@ -49,4 +49,13 @@ public:
         voxels.insert( voxels.end(), new_voxels.begin(), new_voxels.end() );
         return voxels;
     }
+    std::unique_ptr<Feature> copy() override {
+        auto out = std::make_unique<Cylinder>( 0, 0 );
+        out->_settings = _settings;
+        out->_parent = _parent;
+        // out->_is_selected = _is_selected;
+        for ( auto &feature : _sub_features )
+            out->_sub_features.push_back( feature->copy() );
+        return out;
+    }
 };

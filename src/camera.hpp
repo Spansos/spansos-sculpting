@@ -54,8 +54,8 @@ public:
         );
     }
 
-    glm::mat4 getMVP(glm::mat4 model) {
-        return _projection * _view * model;
+    glm::mat4 getMVP() {
+        return _projection * _view;
     }
 
     void resize( int width, int height ) {

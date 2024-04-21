@@ -43,15 +43,8 @@ int main()
     // uniform handles
     GLuint mvp_id = glGetUniformLocation( programID, "MVP" );
 
-
     Complex root;
-    // root.add_feature( std::make_unique<Cylinder>(4, 2) );
-    // root.add_feature( std::make_unique<Cylinder>(6, 3) );
-    auto sub_complex = std::make_unique<Complex>();
-    sub_complex->add_feature( std::make_unique<Cylinder>(40, 12) );
-    sub_complex->add_feature( std::make_unique<Cylinder>(60, 3) );
-    sub_complex->add_feature( std::make_unique<Cylinder>(12, 16) );
-    root.add_feature( std::move(sub_complex) );
+    root.select();
     root.generate();
 
     // set vertex attribs
@@ -77,6 +70,7 @@ int main()
     glEnable(GL_CULL_FACE);
     glClearColor( .2f, .4f, .7f, .0f );
     // int framec = 0;
+    std::unique_ptr<Feature> clipboard = nullptr;
     do{
         glfwPollEvents( );
 
@@ -95,16 +89,57 @@ int main()
         // render
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         // render voxels
-        glm::mat4 mvp_mat = camera.getMVP(root.matrix);
+        glm::mat4 mvp_mat = camera.getMVP();
         glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp_mat[0][0]);
         root.set_buffers( buffers[0], buffers[1], buffers[2] );
         glDrawArrays( GL_TRIANGLES, 0, root.get_vertex_count() );
         // render ui
-        ImGui::Begin( "Features" );
-        root.render_tree();
+        ImGui::Begin( "Features", nullptr, ImGuiWindowFlags_MenuBar );
         Feature * selected = root.get_selected();
-        if ( selected )
+        if (ImGui::BeginMenuBar( )) {
+            // add feature
+            if ( ImGui::BeginMenu("Add feature") ) {
+                if (ImGui::MenuItem( "Complex" ) && selected)
+                    selected->add_feature( std::make_unique<Complex>() );
+                if (ImGui::MenuItem( "Cylinder" ) && selected)
+                    selected->add_feature( std::make_unique<Cylinder>(16, 16) );
+                ImGui::EndMenu( );
+            }
+            // cut
+            if (ImGui::MenuItem( "Cut" ) && selected) {
+                clipboard = selected->copy();
+                Feature * parent = selected->get_parent();
+                if ( parent ) {
+                    parent->remove_feature(selected);
+                    selected = nullptr;
+                }
+            }
+            // copy
+            if (ImGui::MenuItem( "Copy" ) && selected) {
+                clipboard = selected->copy();
+            }
+            // paste
+            if (ImGui::MenuItem( "Paste" ) && selected && clipboard)
+                selected->add_feature( clipboard->copy() );
+            // delete
+            if (ImGui::MenuItem( "Delete" ) && selected) {
+                Feature * parent = selected->get_parent();
+                if ( parent ) {
+                    parent->remove_feature(selected);
+                    selected = nullptr;
+                }
+            }
+
+            ImGui::EndMenuBar( );
+        }
+        ImGui::BeginChild( "Feature tree", ImVec2(0,0), ImGuiChildFlags_ResizeY|ImGuiChildFlags_Border );
+        root.render_tree();
+        ImGui::EndChild();
+        if ( selected ) {
+            ImGui::BeginChild( "Feature settings", ImVec2(0,0), ImGuiChildFlags_AutoResizeY|ImGuiChildFlags_Border );
             selected->render_settings();
+            ImGui::EndChild();
+        }
         ImGui::End( );
         ImGui::Render( );
         ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
