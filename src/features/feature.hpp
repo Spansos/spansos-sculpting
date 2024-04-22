@@ -86,7 +86,9 @@ public:
     virtual std::unique_ptr<Feature> copy() = 0;
 
     virtual void add_feature( std::unique_ptr<Feature> feature ) {
-        (void)feature;
+        if ( !_parent )
+            return;
+        _parent->add_feature( std::move(feature) );
     }
 
     void remove_feature( Feature * feature ) {
