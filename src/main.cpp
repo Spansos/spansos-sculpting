@@ -133,7 +133,9 @@ int main()
             ImGui::EndMenuBar( );
         }
         ImGui::BeginChild( "Feature tree", ImVec2(0,0), ImGuiChildFlags_ResizeY|ImGuiChildFlags_Border );
+        ImGui::PushID("Feature Tree");
         root.render_tree();
+        ImGui::PopID();
         ImGui::EndChild();
         if ( selected ) {
             ImGui::BeginChild( "Feature settings", ImVec2(0,0), ImGuiChildFlags_AutoResizeY|ImGuiChildFlags_Border );
