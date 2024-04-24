@@ -1,8 +1,4 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <optional>
-
-#include <iostream>
+#include "graphics/init.hpp"
 
 std::optional<GLFWwindow *> init() {
     glewExperimental = true; // Needed for core profile
@@ -20,7 +16,6 @@ std::optional<GLFWwindow *> init() {
 
     GLFWwindow* window = glfwCreateWindow( 1024, 768, "Spansos Voxel Sculpting", NULL, NULL);
     if( !window ) {
-        std::cout << "window no window" << std::endl;
         // std::cerr << "Failed to open GLFW window.\n";
         glfwTerminate();
         return {};

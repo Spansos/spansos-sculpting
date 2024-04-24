@@ -1,9 +1,9 @@
 CC     := g++
-CFLAGS := -g -Wall -Werror -Wpedantic -Wextra -O0
+CFLAGS := -g -Wall -Werror -Wpedantic -Wextra -O0 -Iinclude
 
 # cpp and header files from own project
 CPP_FILES := $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
-HEADERS   := $(wildcard src/*.hpp) $(wildcard src/*/*.hpp)
+HEADERS   := $(wildcard include/*.hpp) $(wildcard include/*/*.hpp)
 
 # packages from package manager
 PACKAGES := glfw3 glew glm gl libpng
