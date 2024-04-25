@@ -4,18 +4,16 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include <iostream>
+#include "graphics/window.hpp"
 
-class Camera {
+class Camera : WindowEventListener {
 public:
-    Camera( );
+    Camera( Window * window );
     void do_input_shit();
     glm::mat4 getMVP();
-    void resize( int width, int height );
-    static void resize_callback( GLFWwindow * window, int width, int height );
-
+    void resized( Window * window, glm::ivec2 size ) override;
 private:
-    static Camera * active_camera;
+    Window * _window;
     glm::vec3 _point_of_intereset = {0.0f, 0.0f, 0.0f};
     glm::vec3 _position = {30.0f,0.0f,0.0f};
     glm::vec2 _prev_mouse_pos;

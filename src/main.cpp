@@ -6,22 +6,18 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "graphics/init.hpp"
+#include "graphics/window.hpp"
 #include "graphics/load_shader.hpp"
-#include "camera.hpp"
+#include "graphics/camera.hpp"
 #include "features/complex.hpp"
 #include "features/cylinder.hpp"
 
 
 int main() {
-    auto window = init().value();
+    Window window{ {1024, 768}, "Spansos Voxel Sculpting" };
 
-    Camera camera;
-    glfwSetFramebufferSizeCallback(
-        window,
-        Camera::resize_callback
-    );
-    camera.resize(1024, 768);
+    Camera camera{&window};
+    camera.resized( &window, glm::ivec2{1024, 768} );
     
     // vertex array
     GLuint VertexArrayID;
@@ -56,7 +52,7 @@ int main() {
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    ImGui_ImplGlfw_InitForOpenGL( window, true );
+    ImGui_ImplGlfw_InitForOpenGL( window.raw(), true );
     ImGui_ImplOpenGL3_Init( );
 
     // last settings
@@ -141,12 +137,12 @@ int main() {
         ImGui::Render( );
         ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 
-        glfwSwapBuffers(window);
+        window.update();
     }
     while(
-        glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS
+        glfwGetKey(window.raw(), GLFW_KEY_ESCAPE ) != GLFW_PRESS
         &&
-        !glfwWindowShouldClose(window)
+        !window.should_close()
     );
 
     // Cleanup

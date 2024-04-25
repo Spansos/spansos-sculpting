@@ -1,12 +1,12 @@
-#include "camera.hpp"
+#include "graphics/camera.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <imgui.h>
 
+#include <iostream>
 
-Camera::Camera( ) {
-    if ( !active_camera )
-        active_camera = this;
+Camera::Camera( Window * window ) : _window(window) {
+    window->subscribe( this );
 }
 
 void Camera::do_input_shit() {
@@ -54,19 +54,12 @@ glm::mat4 Camera::getMVP() {
     return _projection * _view;
 }
 
-void Camera::resize( int width, int height ) {
-    glViewport( 0, 0, width, height );
+void Camera::resized( Window * window, glm::ivec2 size ) {
+    (void)window;
     _projection = glm::perspective(
         glm::radians(_FoV),
-        (float)width/height,
+        (float)size.x/size.y,
         0.1f,
         250.0f
     );
 }
-
-void Camera::resize_callback( GLFWwindow * window, int width, int height ) {
-    (void)window;
-    Camera::active_camera->resize( width, height );
-}
-
-Camera * Camera::active_camera;
