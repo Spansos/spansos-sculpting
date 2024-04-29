@@ -7,36 +7,33 @@ Cylinder::Cylinder( int length, float radius ) :
     _settings["length"] = length;
 }
 
-std::vector< glm::ivec3 > Cylinder::get_voxels( std::vector<glm::ivec3> voxels ) {
+void Cylinder::generate_voxels( ) {
+    _voxels.clear();
+
     float radius = std::get<float>(_settings.at("radius"));
     int length = std::get<int>(_settings.at("length"));
-
-    std::vector<glm::ivec3> new_voxels;
 
     float x = radius;
     int y = 0;
     while ( y <= x ) {
-        new_voxels.push_back( {x, y, 0} );
+        _voxels.push_back( {x, y, 0} );
         glm::vec3 mid_next = ( glm::vec3{x,y+1,0} + glm::vec3{x-1,y+1,0} ) / 2.0f;
         if (mid_next.x*mid_next.x + mid_next.y*mid_next.y > radius*radius )
             x--;
         y++;
     }
     
-    for ( int i=new_voxels.size()-1; i>=0; i-- )
-        new_voxels.push_back( {new_voxels[i].y, new_voxels[i].x, 0} );
-    for ( int i=new_voxels.size()-2; i>=0; i-- )
-        new_voxels.push_back( {-new_voxels[i].x, new_voxels[i].y, 0} );
-    for ( int i=new_voxels.size()-2; i>=1; i-- )
-        new_voxels.push_back( {new_voxels[i].x, -new_voxels[i].y, 0} );
+    for ( int i=_voxels.size()-1; i>=0; i-- )
+        _voxels.push_back( {_voxels[i].y, _voxels[i].x, 0} );
+    for ( int i=_voxels.size()-2; i>=0; i-- )
+        _voxels.push_back( {-_voxels[i].x, _voxels[i].y, 0} );
+    for ( int i=_voxels.size()-2; i>=1; i-- )
+        _voxels.push_back( {_voxels[i].x, -_voxels[i].y, 0} );
     
-    int voxel_c = new_voxels.size();
+    int voxel_c = _voxels.size();
     for ( int j=0; j<length; j++ )
         for ( int i=0; i<voxel_c; i++ )
-            new_voxels.push_back( {new_voxels[i].x, new_voxels[i].y, j} );
-
-    voxels.insert( voxels.end(), new_voxels.begin(), new_voxels.end() );
-    return voxels;
+            _voxels.push_back( {_voxels[i].x, _voxels[i].y, j} );
 }
 
 std::unique_ptr<Feature> Cylinder::copy() {

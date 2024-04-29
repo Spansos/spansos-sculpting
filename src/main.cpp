@@ -9,40 +9,25 @@
 #include "graphics/window.hpp"
 #include "graphics/load_shader.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/renderer.hpp"
+#include "graphics/mesh.hpp"
+
 #include "features/complex.hpp"
 #include "features/cylinder.hpp"
 
+#include <iostream>
 
 int main() {
     Window window{ {1024, 768}, "Spansos Voxel Sculpting" };
 
     Camera camera{&window};
     camera.resized( &window, glm::ivec2{1024, 768} );
-    
-    // vertex array
-    GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
 
-    // buffers
-    GLuint buffers[3];
-    glGenBuffers(3, buffers);
-
-    // shaders
-    GLuint programID = LoadShaders("vertex.glsl", "fragment.glsl");
-    glUseProgram(programID);
-    // uniform handles
-    GLuint mvp_id = glGetUniformLocation( programID, "MVP" );
+    Renderer renderer{ "resources/fragment.glsl", "resources/vertex.glsl" };
 
     Complex root;
     root.select();
-    root.generate();
-
-    // set vertex attribs
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-    root.set_vertex_attributes( buffers[0], buffers[1], buffers[2], 0, 1, 2 );
+    root.generate_voxels();
 
     // imgui setup
     IMGUI_CHECKVERSION();
@@ -76,14 +61,10 @@ int main() {
         //     framec %= 60;
         // }
         camera.do_input_shit();
+        renderer.set_mvp( camera.getMVP() );
         
-        // render
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-        // render voxels
-        glm::mat4 mvp_mat = camera.getMVP();
-        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp_mat[0][0]);
-        root.set_buffers( buffers[0], buffers[1], buffers[2] );
-        glDrawArrays( GL_TRIANGLES, 0, root.get_vertex_count() );
+        window.clear( .4, .5, .6 );
+        renderer.draw( window, Mesh{ root.get_voxels() } );
         // render ui
         ImGui::Begin( "Features", nullptr, ImGuiWindowFlags_MenuBar );
         Feature * selected = root.get_selected();
@@ -149,14 +130,6 @@ int main() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-	glDeleteBuffers(3, buffers);
-	glDeleteProgram(programID);
-	glDeleteVertexArrays(1, &VertexArrayID);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
-
-	glfwTerminate();
   
     return 0;
 }

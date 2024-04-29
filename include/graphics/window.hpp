@@ -17,6 +17,7 @@ class Window {
 public:
     Window( glm::ivec2 resolution, std::string title, int antialiasing=4, int gl_version_major=4, int gl_version_minor=0 );
     ~Window();
+    void clear( float red, float green, float blue );
     void update();
     void subscribe( WindowEventListener * listener );
     bool should_close();

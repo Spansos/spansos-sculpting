@@ -42,6 +42,12 @@ Window::Window( glm::ivec2 resolution, std::string title, int antialiasing, int 
 
 Window::~Window() {
     glfwDestroyWindow( _raw_window );
+    glfwTerminate( );
+}
+
+void Window::clear( float red, float green, float blue ) {
+    glClearColor( red, green, blue, 0 );
+    glClear( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 }
 
 void Window::update() {

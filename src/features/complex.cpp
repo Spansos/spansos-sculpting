@@ -5,14 +5,15 @@ Complex::Complex() : Feature( "Complex" ) { }
 void Complex::add_feature( std::unique_ptr<Feature> feature ) {
     feature->_parent = this;
     _sub_features.push_back( std::move(feature) );
-    get_root()->generate();
+    get_root()->generate_voxels();
 }
 
-std::vector< glm::ivec3 > Complex::get_voxels( std::vector<glm::ivec3> voxels ) {
+void Complex::generate_voxels() {
+    _voxels.clear();
     for ( auto &feature : _sub_features ) {
-        voxels = feature->get_voxels( voxels );
+        feature->generate_voxels();
+        _voxels.insert( _voxels.end(), feature->get_voxels().begin(), feature->get_voxels().end() );
     }
-    return voxels;
 }
 
 std::unique_ptr<Feature> Complex::copy() {
